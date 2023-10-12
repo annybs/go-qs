@@ -6,6 +6,7 @@ import (
 	"net/url"
 	"regexp"
 	"strconv"
+	"strings"
 )
 
 // Query error.
@@ -14,7 +15,11 @@ var (
 	ErrTooManyFilters = errors.New("too many filters")
 )
 
-var filterRegexp = regexp.MustCompile("^([A-z0-9]+) (eq|neq|gt|gte|lt|lte|in|not in|like|not like) (.+)$")
+var (
+	filterRegexp = regexp.MustCompile("^([A-z0-9]+) (eq|neq|gt|gte|lt|lte|in|not in|like|not like) (.+)$")
+
+	sliceSeparator = ","
+)
 
 // Filter represents a filter as used in, most likely, a database query.
 type Filter struct {
@@ -23,9 +28,37 @@ type Filter struct {
 	Value    string `json:"value"`    // Value to filter by.
 }
 
+// BoolSlice retrieves the filter value as a slice of bools.
+func (filter Filter) BoolSlice() ([]bool, error) {
+	values := strings.Split(filter.Value, sliceSeparator)
+	bools := []bool{}
+	for _, value := range values {
+		boolValue, err := strconv.ParseBool(value)
+		if err != nil {
+			return nil, err
+		}
+		bools = append(bools, boolValue)
+	}
+	return bools, nil
+}
+
 // BoolValue retrieves the filter value as a bool.
 func (filter Filter) BoolValue() (bool, error) {
 	return strconv.ParseBool(filter.Value)
+}
+
+// Float32Slice retrieves the filter value as a slice of float32s.
+func (filter Filter) Float32Slice() ([]float32, error) {
+	values := strings.Split(filter.Value, sliceSeparator)
+	floats := []float32{}
+	for _, value := range values {
+		floatValue, err := strconv.ParseFloat(value, 32)
+		if err != nil {
+			return nil, err
+		}
+		floats = append(floats, float32(floatValue))
+	}
+	return floats, nil
 }
 
 // Float32Value retrieves the filter value as a float32.
@@ -34,14 +67,48 @@ func (filter Filter) Float32Value() (float32, error) {
 	return float32(value), err
 }
 
+// Float64Slice retrieves the filter value as a slice of float64s.
+func (filter Filter) Float64Slice() ([]float64, error) {
+	values := strings.Split(filter.Value, sliceSeparator)
+	floats := []float64{}
+	for _, value := range values {
+		floatValue, err := strconv.ParseFloat(value, 64)
+		if err != nil {
+			return nil, err
+		}
+		floats = append(floats, float64(floatValue))
+	}
+	return floats, nil
+}
+
 // Float64Value retrieves the filter value as a float64.
 func (filter Filter) Float64Value() (float64, error) {
 	return strconv.ParseFloat(filter.Value, 64)
 }
 
+// IntSlice retrieves the filter value as a slice of ints.
+func (filter Filter) IntSlice() ([]int, error) {
+	values := strings.Split(filter.Value, sliceSeparator)
+	ints := []int{}
+	for _, value := range values {
+		intValue, err := strconv.Atoi(value)
+		if err != nil {
+			return nil, err
+		}
+		ints = append(ints, int(intValue))
+	}
+	return ints, nil
+}
+
 // IntValue retrieves the filter value as an int.
 func (filter Filter) IntValue() (int, error) {
 	return strconv.Atoi(filter.Value)
+}
+
+// StringSlice retrieves the filter value as a slice of strings.
+func (filter Filter) StringSlice() ([]string, error) {
+	strings := strings.Split(filter.Value, sliceSeparator)
+	return strings, nil
 }
 
 // Filters is a slice of Filter structs.
