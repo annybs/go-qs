@@ -10,6 +10,7 @@ type Page struct {
 	Pagination *Pagination `json:"pagination"`
 	Filters    Filters     `json:"filters,omitempty"`
 	Sorts      Sorts       `json:"sorts,omitempty"`
+	Joins      Joins       `json:"joins,omitempty"`
 }
 
 // ReadPageOptions configures the behaviour of ReadPage.
@@ -17,6 +18,7 @@ type ReadPageOptions struct {
 	Pagination *ReadPaginationOptions
 	Filter     *ReadFiltersOptions
 	Sort       *ReadSortsOptions
+	Join       *ReadJoinsOptions
 }
 
 // ReadPage parses URL values into a convenient Page struct.
@@ -38,10 +40,16 @@ func ReadPage(values url.Values, opt *ReadPageOptions) (*Page, error) {
 		return nil, err
 	}
 
+	joins, err := ReadJoins(values, opt.Join)
+	if err != nil {
+		return nil, err
+	}
+
 	page := &Page{
 		Pagination: pag,
 		Filters:    filters,
 		Sorts:      sorts,
+		Joins:      joins,
 	}
 	return page, nil
 }

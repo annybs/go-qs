@@ -44,6 +44,19 @@ func TestReadPage(t *testing.T) {
 				},
 			},
 		},
+		{
+			Input: "limit=10&page=2&filter=title eq Spaghetti&sort=serves desc&join=author",
+			Output: &Page{
+				Pagination: &Pagination{Limit: 10, Offset: 10, Page: 2},
+				Filters: []Filter{
+					{Field: "title", Operator: "eq", Value: "Spaghetti"},
+				},
+				Sorts: []Sort{
+					{Field: "serves", Direction: "desc"},
+				},
+				Joins: Joins{"author": true},
+			},
+		},
 	}
 
 	for n, tc := range testCases {
@@ -101,6 +114,21 @@ func TestReadPage(t *testing.T) {
 			}
 			if sort != page.Sorts[i] {
 				t.Errorf("Expected %+v for sort %d, got %+v", sort, i, page.Sorts[i])
+			}
+		}
+
+		// Compare joins (see join_test.go)
+		if tc.Output.Joins == nil && page.Joins != nil {
+			t.Error("Expected nil sorts")
+		}
+
+		if len(page.Joins) != len(tc.Output.Joins) {
+			t.Errorf("Expected %d joins, got %d", len(tc.Output.Joins), len(page.Joins))
+		}
+
+		for name, join := range tc.Output.Joins {
+			if join != page.Joins[name] {
+				t.Errorf("Expected %t for join %s, got %t", join, name, page.Joins[name])
 			}
 		}
 	}
