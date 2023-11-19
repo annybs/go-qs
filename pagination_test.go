@@ -1,6 +1,9 @@
 package qs
 
-import "testing"
+import (
+	"errors"
+	"testing"
+)
 
 func TestReadPagination(t *testing.T) {
 	type TestCase struct {
@@ -34,7 +37,7 @@ func TestReadPagination(t *testing.T) {
 
 		pag, err := ReadStringPagination(tc.Input, tc.Opt)
 
-		if err != tc.Err {
+		if !errors.Is(err, tc.Err) {
 			t.Errorf("Expected error %v, got %v", tc.Err, err)
 			continue
 		}

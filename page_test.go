@@ -1,6 +1,9 @@
 package qs
 
-import "testing"
+import (
+	"errors"
+	"testing"
+)
 
 func TestReadPage(t *testing.T) {
 	type TestCase struct {
@@ -64,7 +67,7 @@ func TestReadPage(t *testing.T) {
 
 		page, err := ReadStringPage(tc.Input, tc.Opt)
 
-		if err != tc.Err {
+		if !errors.Is(err, tc.Err) {
 			t.Errorf("Expected error %v, got %v", tc.Err, err)
 		}
 		if tc.Err != nil {

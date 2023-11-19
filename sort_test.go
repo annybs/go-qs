@@ -1,6 +1,9 @@
 package qs
 
-import "testing"
+import (
+	"errors"
+	"testing"
+)
 
 func TestReadSorts(t *testing.T) {
 	type TestCase struct {
@@ -32,7 +35,7 @@ func TestReadSorts(t *testing.T) {
 
 		sorts, err := ReadStringSorts(tc.Input, nil)
 
-		if err != tc.Err {
+		if !errors.Is(err, tc.Err) {
 			t.Errorf("Expected error %v, got %v", tc.Err, err)
 		}
 		if tc.Err != nil {
