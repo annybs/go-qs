@@ -1,3 +1,3 @@
-module github.com/recipeer/go/qs
+module github.com/annybs/go/qs
 
 go 1.21
