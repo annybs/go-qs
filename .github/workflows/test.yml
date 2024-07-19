@@ -1,0 +1,47 @@
+name: Test
+
+on:
+  pull_request:
+    branches:
+      - develop
+  push:
+    branches:
+      - develop
+
+jobs:
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: ^1.21.0
+
+      - name: Display Go version
+        run: go version
+
+      - name: Install dependencies
+        run: go get
+
+      - name: Run tests
+        run: go test -v
+
+  notify:
+    name: Send Discord workflow notification
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - name: Send notification
+        uses: annybs/action-notify-discord@v1
+        if: ${{ always() }}
+        with:
+          repository: ${{ github.repository }}
+          result: ${{ needs.test.result }}
+          run-id: ${{ github.run_id }}
+          run-number: ${{ github.run_number }}
+          webhook-url: ${{ secrets.DISCORD_WEBHOOK }}
+          workflow: ${{ github.workflow }}
