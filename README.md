@@ -47,4 +47,4 @@ Open <http://localhost:8000> in your browser and try different query strings (pe
 
 ## License
 
-See [LICENSE.md](../LICENSE.md)
+See [LICENSE.md](./LICENSE.md)
